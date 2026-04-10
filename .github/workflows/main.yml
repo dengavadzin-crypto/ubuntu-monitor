@@ -1,4 +1,4 @@
-name: Docker Build Check
+name: Docker Build and Deploy
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - ubuntu-monitor
 
 jobs:
-  build-image:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,3 +17,18 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t ubuntu-monitor ./ubuntu-monitor
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: Executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/Denys
+            git pull origin ubuntu-monitor
+            docker compose up -d --build
