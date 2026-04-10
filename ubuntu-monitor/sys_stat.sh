@@ -1,17 +1,20 @@
 #!/bin/bash
 
-# 1. Собираем данные в переменные
-CURRENT_DATE=$(date)
-LOGGED_USERS=$(who | awk '{print $1"["$NF"]"}' | sed 's/[()]//g' | xargs)
-UPTIME_INFO=$(uptime -p)    # Флаг -p делает вывод "красивым" (pretty)
+while true; do
+  # 1. Собираем данные в переменные (твой код)
+  CURRENT_DATE=$(date)
+  LOGGED_USERS=$(who | awk '{print $1"["$NF"]"}' | sed 's/[()]//g' | xargs)
+  UPTIME_INFO=$(uptime -p)
 
-# 2. Формируем одну общую строку для отчета
-REPORT="[REPORT] Date: $CURRENT_DATE | Users online: $LOGGED_USERS | Uptime: $UPTIME_INFO"
+  # 2. Формируем строку отчета
+  REPORT="[REPORT] Date: $CURRENT_DATE | Users online: $LOGGED_USERS | Uptime: $UPTIME_INFO"
 
-# 3. Выводим отчет на экран (чтобы мы видели его в консоли)
-echo "$REPORT"
+  # 3. Вывод для Docker Logs (чтобы мы видели это через docker compose logs)
+  echo "$REPORT"
 
-# 4. Отправляем отчет в системный журнал
-logger "$REPORT"
+  # 4. Логирование (внутри контейнера logger может не сработать без спец. настройки, 
+  # поэтому дополнительно сохраним в файл, который мы потом сможем вытащить)
+  echo "$REPORT" >> /var/log/sys_stat.log
 
-echo "Информация успешно сохранена в системный журнал."
+  sleep 10
+done

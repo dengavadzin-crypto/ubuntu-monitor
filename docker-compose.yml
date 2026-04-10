@@ -1,0 +1,10 @@
+services:
+  monitor:
+    build:
+      context: ./ubuntu-monitor
+    restart: always
+
+  web-check:
+    image: nginx:latest
+    ports:
+      - "8080:80"
