@@ -1,0 +1,16 @@
+name: Docker Build Check 🏷️
+
+on:
+  push:
+    branches:
+      - ubuntu-monitor ⚡
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest 🏃‍♂️
+    steps:
+      - name: Checkout code 📥
+        uses: actions/checkout@v4
+
+      - name: Build Docker image 🐳
+        run: docker build -t ubuntu-monitor ./ubuntu-monitor
