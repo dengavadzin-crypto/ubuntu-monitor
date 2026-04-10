@@ -22,26 +22,18 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-test
     steps:
-      # --- ВОТ ЭТОТ БЛОК МЫ ВСТАВИЛИ ---
-      - name: Check if secret is empty
+      - name: Deploy via SSH
         env:
-          MY_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
         run: |
-          if [ -z "$MY_KEY" ]; then
-            echo "ERROR: SSH_KEY is empty or not found!"
-            exit 1
-          else
-            echo "SSH_KEY is present. Character count: ${#MY_KEY}"
-          fi
-      # --- КОНЕЦ БЛОКА ПРОВЕРКИ ---
-
-      - name: Executing remote ssh commands to deploy
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd ~/Denys
-            git pull origin ubuntu-monitor
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "$USERNAME@$HOST" "
+            cd ~/Denys &&
+            git pull origin ubuntu-monitor &&
             docker compose up -d --build
+          "
