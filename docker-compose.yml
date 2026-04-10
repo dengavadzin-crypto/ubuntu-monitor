@@ -3,3 +3,5 @@ services:
     build:
       context: ./ubuntu-monitor
     restart: always
+    volumes:
+      - ./logs:/var/log
