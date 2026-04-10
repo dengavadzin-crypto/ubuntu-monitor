@@ -1,18 +1,15 @@
 #!/bin/bash
 
 while true; do
-  # Обновим формат даты и добавим Load Average
   CURRENT_DATE=$(date "+%Y-%m-%d %H:%M:%S")
+  LOGGED_USERS=$(who | awk '{print $1"["$NF"]"}' | sed 's/[()]//g' | xargs)
   CPU_LOAD=$(uptime | awk -F'load average:' '{ print $2 }')
   UPTIME_INFO=$(uptime -p)
 
-  # Новый заголовок, чтобы сразу заметить обновление
-  REPORT="[v2.0 MONITORING] $CURRENT_DATE | CPU Load:$CPU_LOAD | $UPTIME_INFO"
+  REPORT="[MONITOR] $CURRENT_DATE | Users: ${LOGGED_USERS:-none} | CPU Load:$CPU_LOAD | $UPTIME_INFO"
 
   echo "$REPORT"
-  # Логируем внутри контейнера
   echo "$REPORT" >> /var/log/sys_stat.log
 
-  # Ускорим проверку до 5 секунд для теста
-  sleep 5
+  sleep 10
 done
