@@ -7,10 +7,13 @@ on:
 
 jobs:
   build-image:
-    runs-on: ubuntu-latest ‍
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code 
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Check Bash syntax
+        run: shellcheck ./ubuntu-monitor/sys_stat.sh
 
       - name: Build Docker image
         run: docker build -t ubuntu-monitor ./ubuntu-monitor
