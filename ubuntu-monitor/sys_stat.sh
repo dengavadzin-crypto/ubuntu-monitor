@@ -1,20 +1,18 @@
 #!/bin/bash
 
 while true; do
-  # 1. Собираем данные в переменные (твой код)
-  CURRENT_DATE=$(date)
-  LOGGED_USERS=$(who | awk '{print $1"["$NF"]"}' | sed 's/[()]//g' | xargs)
+  # Обновим формат даты и добавим Load Average
+  CURRENT_DATE=$(date "+%Y-%m-%d %H:%M:%S")
+  CPU_LOAD=$(uptime | awk -F'load average:' '{ print $2 }')
   UPTIME_INFO=$(uptime -p)
 
-  # 2. Формируем строку отчета
-  REPORT="[REPORT] Date: $CURRENT_DATE | Users online: $LOGGED_USERS | Uptime: $UPTIME_INFO"
+  # Новый заголовок, чтобы сразу заметить обновление
+  REPORT="[v2.0 MONITORING] $CURRENT_DATE | CPU Load:$CPU_LOAD | $UPTIME_INFO"
 
-  # 3. Вывод для Docker Logs (чтобы мы видели это через docker compose logs)
   echo "$REPORT"
-
-  # 4. Логирование (внутри контейнера logger может не сработать без спец. настройки, 
-  # поэтому дополнительно сохраним в файл, который мы потом сможем вытащить)
+  # Логируем внутри контейнера
   echo "$REPORT" >> /var/log/sys_stat.log
 
-  sleep 10
+  # Ускорим проверку до 5 секунд для теста
+  sleep 5
 done
