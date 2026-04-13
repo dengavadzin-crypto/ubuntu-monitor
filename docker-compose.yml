@@ -1,7 +1,7 @@
 services:
   monitor:
     build:
-      context: ./ubuntu-monitor
+      context: ./monitoring/ubuntu-monitor
     restart: always
     volumes:
       - ./logs:/var/log
@@ -18,7 +18,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./monitoring/prometheus:/etc/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
 
