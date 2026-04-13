@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sys-monitor
+  namespace: monitor
+spec:
+  selector:
+    matchLabels:
+      app: sys-monitor
+  template:
+    metadata:
+      labels:
+        app: sys-monitor
+    spec:
+      containers:
+        - name: sys-monitor
+          image: dengavadzin/ubuntu-monitor:latest
+          volumeMounts:
+            - name: logs
+              mountPath: /var/log
+      volumes:
+        - name: logs
+          hostPath:
+            path: /var/log/ubuntu-monitor
